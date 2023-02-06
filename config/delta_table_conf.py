@@ -18,3 +18,4 @@ raghava_cards_gold_path = '~/lakehouse_project/data_tables/raghava_cards_gold_pa
 raji_cards_gold_path = '~/lakehouse_project/data_tables/raji_cards_gold_path'
 rohan_cards_gold_path = '~/lakehouse_project/data_tables/rohan_cards_gold_path'
 shiva_cards_gold_path = '~/lakehouse_project/data_tables/shiva_cards_gold_path'
+

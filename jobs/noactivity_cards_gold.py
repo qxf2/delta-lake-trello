@@ -11,7 +11,6 @@ import sys
 from datetime import datetime, timedelta
 import argparse
 from loguru import logger
-from delta.tables import DeltaTable
 from pyspark.sql.functions import col
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from helpers import spark_helper as sh, common_functions as cf, trello_functions as tf
@@ -28,8 +27,6 @@ def get_noactivity_cards(spark, board_id, board_name, no_of_days):
     :return none
     """
     path = dc.noactive_cards_gold_path
-    deltaTable = DeltaTable.forPath(spark, path)
-
     try:
         # Fetch the cards data from the refined cards silver delta table
         refined_cards_data = spark.read.format(
@@ -41,23 +38,21 @@ def get_noactivity_cards(spark, board_id, board_name, no_of_days):
         refined_doing_cards_data = refined_cards_data.where(
             col("idList") == doing_list_id)
 
-        # Fetch all cards that are not active from past 7 days
+        # Fetch all cards that are not active from provided number of days
         noactive_doing_cards = refined_doing_cards_data.where(
             col('dateLastActivity') < datetime.now() - timedelta(days=no_of_days))
         logger.info('Fetched all the doing cards that have no activity')
 
+        #Select the required columns
         noactive_doing_cards = noactive_doing_cards.select(
             "id", "name", "card_members", "LastUpdated", "board_name")
 
-        # deltaTable.alias("target").merge(
-        #     source=noactive_doing_cards.alias("source"),
-        #     condition="target.id = source.id").whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
+        #Write the data to Delta Lake Gold table
         noactive_doing_cards.write.format('delta').mode(
-            "append").option("mergeSchema", 'true').save(path)
+            "overwrite").option("mergeSchema", 'true').save(path)
 
         logger.success(
             f'\n Saved no activity doing cards data for board {board_id} {board_name}')
-        #df.create_delta_table(noactive_doing_cards, path)
         logger.info(
             f'Saved no activity doing cards data for board {board_id} {board_name} to {path} table')
 
@@ -95,7 +90,7 @@ def perform_noactive_cards_aggregation_to_gold(no_of_days):
 # --------START OF SCRIPT
 if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description='Create gold delta table')
-    PARSER.add_argument('--days', metavar='path', required=True,
-                        help='Number of days cards are not active')
+    PARSER.add_argument('--days', metavar='number', required=True,
+                        help='Number of days')
     ARGS = PARSER.parse_args()
     perform_noactive_cards_aggregation_to_gold(int(ARGS.days))

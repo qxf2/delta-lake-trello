@@ -35,7 +35,7 @@ def ingest_raw_cards_data_bronze(spark, spark_context, board_id, board_name):
             jsonRDD = spark_context.parallelize([json.dumps(card_obj)])
             data_df = spark.read.json(jsonRDD, multiLine=True)
             data_df = data_df.select("id", "closed", "dateLastActivity", "due", "idBoard",
-                                     "idList", "desc", "idMembers", "name", "shortLink", "shortUrl", "url")
+                                     "idList", "desc", "idMembers", "name", "shortLink", "shortUrl", "url")            
             deltaTable.alias("target").merge(
                 source=data_df.alias("source"),
                 condition="target.id = source.id").whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
@@ -61,15 +61,17 @@ def ingest_raw_members_data_bronze(spark, spark_context, board_id, board_name):
         all_members = tf.get_all_members(board_id)
         logger.success(
             f'Fetched all the members of the board {board_id}, {board_name}')
+        deltaTable = DeltaTable.forPath(spark, path)
         for each_mem in all_members:
             mem_obj = tf.fetch_member_details(each_mem)
             jsonRDD = spark_context.parallelize([json.dumps(mem_obj)])
             data_df = spark.read.json(jsonRDD, multiLine=True)
             # Select only the required columns
             data_df = data_df.select("id", "fullName", "initials", "memberType",
-                                     "url", "username", "status", "email", "idOrganizations")
-            data_df.write.format('delta').mode("append").option(
-                "mergeSchema", 'true').save(path)
+                                     "url", "username", "status", "email", "idOrganizations")            
+            deltaTable.alias("target").merge(
+                source=data_df.alias("source"),
+                condition="target.id = source.id").whenMatchedUpdateAll().whenNotMatchedInsertAll().execute()
         logger.success(
             f'Successfully added the members data to delta bronze table for the board {board_id}, {board_name}')
     except Exception as error:

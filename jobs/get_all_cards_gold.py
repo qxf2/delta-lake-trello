@@ -19,9 +19,8 @@ def get_cards(spark, start_date, end_date):
     """
     Fetch all the cards data of a user within the mentioned date range
     :param spark: Spark session
-    :param board_id: trello board id
-    :param board_name: trello board name
-    :param no_of_days: number of days the cards are not active
+    :param start_date: Start date
+    :param end_date: End date
     :return none
     """
     path = dc.ajitava_cards_gold_path
@@ -30,14 +29,16 @@ def get_cards(spark, start_date, end_date):
         refined_cards_data = spark.read.format(
             "delta").load(dc.cards_unique_silver_table_path)
         logger.info(f'Fetched the refined cards data from silver table')
-
+        
+        #Fetch the data based on user
         user_card_data = refined_cards_data.filter((col("card_members").like("Ajitava Deb")))
         logger.info(f'Got the user cards based on specific user')
 
         # Get the dates
         start_date = datetime.strptime(start_date, "%d-%m-%Y")
         end_date = datetime.strptime(end_date, "%d-%m-%Y")
-
+        
+        #Fetch the data based on specified duration
         user_date_cards = user_card_data.where((col('dateLastActivity') == start_date) & (col('dateLastActivity') == end_date))
         logger.info(f'Fetched user cards for specific duration')
 
@@ -72,7 +73,7 @@ def perform_user_cards_aggregation_to_gold(start_date,end_date):
 
         # Fetch cards for specified duration
         get_cards(spark, start_date, end_date)
-        logger.success('Completed the user activity cards job')
+        logger.success('Completed fetching data for the specified duration')
 
     except Exception as error:
         logger.exception(

@@ -15,7 +15,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from helpers import spark_helper as sh, common_functions as cf, trello_functions as tf
 from config import delta_table_conf as dc
 
-def get_all_cards(spark, start_date, end_date):
+def get_user_cards(spark, start_date, end_date):
     """
     Fetch all the cards data for the given user within the given date range 
     and save it into a Delta Lake Gold table
@@ -29,6 +29,8 @@ def get_all_cards(spark, start_date, end_date):
         # Fetch the cards data from the refined cards silver delta table
         refined_cards_data = spark.read.format(
             "delta").load(dc.cards_unique_silver_table_path)
+        logger.info(
+            f'fetched refined card data from silver delta table')      
         
         # Convert from_date to a datetime object
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
@@ -49,9 +51,9 @@ def get_all_cards(spark, start_date, end_date):
             "overwrite").option("mergeSchema", 'true').save(path)    
 
         logger.success(
-            f'\n Saved all cards data')
+            f'\n Saved user card data')
         logger.info(
-            f'Saved all cards data to {path} table')    
+            f'Saved user card data to {path} table')    
 
     except Exception as error:
         logger.exception(
@@ -59,7 +61,7 @@ def get_all_cards(spark, start_date, end_date):
         raise error
 
 
-def perform_all_cards_aggregation_to_gold(start_date, end_date):
+def perform_user_cards_aggregation_to_gold(start_date, end_date):
     """
     Run the steps to get all the data of cards within the provided dates and place it Delta Lake Gold table
     """
@@ -69,12 +71,12 @@ def perform_all_cards_aggregation_to_gold(start_date, end_date):
         spark, context = sh.start_spark()
 
         # Fetch all cards for the given date range
-        get_all_cards(spark, start_date, end_date)
-        logger.success('Completed get all cards by date range job')
+        get_user_cards(spark, start_date, end_date)
+        logger.success('Completed get user cards by date range job')
 
     except Exception as error:
         logger.exception(
-            f'Failure in job to fetch card data between the dates {start_date} - {end_date}')
+            f'Failure in job to fetch user card data between the dates {start_date} - {end_date}')
         raise error
 
 
@@ -84,4 +86,4 @@ if __name__ == "__main__":
     PARSER.add_argument('--start_date', type=str, required=True, help='Start date in the format YYYY-MM-DD')
     PARSER.add_argument('--end_date', type=str, required=True, help='End date in the format YYYY-MM-DD')
     ARGS = PARSER.parse_args()
-    perform_all_cards_aggregation_to_gold(ARGS.start_date, ARGS.end_date)
+    perform_user_cards_aggregation_to_gold(ARGS.start_date, ARGS.end_date)

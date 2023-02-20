@@ -30,7 +30,7 @@ def get_user_cards(spark, start_date, end_date):
         refined_cards_data = spark.read.format(
             "delta").load(dc.cards_unique_silver_table_path)
         logger.info(
-            f'fetched refined card data from silver delta table')      
+            f'Fetched refined card data from silver delta table')      
         
         # Convert from_date to a datetime object
         start_date = datetime.strptime(start_date, '%Y-%m-%d')

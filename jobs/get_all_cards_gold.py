@@ -56,7 +56,7 @@ def get_cards(spark, start_date, end_date):
 
     except Exception as error:
         logger.exception(
-            f'Exception while fetching no activity doing cards for {board_id} {board_name}')
+            f'Exception while fetching user data')
         raise error
 
 
@@ -70,7 +70,7 @@ def perform_user_cards_aggregation_to_gold(start_date,end_date):
         # Get SparkSession and SparkContext
         spark, context = sh.start_spark()
 
-        # Fetch cards that have no activity from past 7 days
+        # Fetch cards for specified duration
         get_cards(spark, start_date, end_date)
         logger.success('Completed the user activity cards job')
 

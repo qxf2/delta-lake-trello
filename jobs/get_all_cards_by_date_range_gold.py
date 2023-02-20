@@ -1,8 +1,8 @@
 """
 This script will fetch all the cards for the given user according to the below criteria:
 - get the date within the given date range 
-Save the data to Delta Lake Gold table
-This script is scheduled to run twice a week
+- save the data to Delta Lake Gold table
+- This script is scheduled to run twice a week
 """
 
 import os
@@ -32,8 +32,10 @@ def get_all_cards(spark, start_date, end_date):
         
         # Convert from_date to a datetime object
         start_date = datetime.strptime(start_date, '%Y-%m-%d')
+
         # Convert "dateLastActivity" column to date format
         refined_cards_data = refined_cards_data.withColumn("dateLastActivity", to_date(from_utc_timestamp("dateLastActivity", "UTC")))
+        
         # Filter the DataFrame for the given user and date range
         filtered_cards_data = refined_cards_data.filter((col("card_members").like("%Indiranellutla%")) & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
         logger.info(f'Fetched all the cards within the date range')  
@@ -68,7 +70,7 @@ def perform_all_cards_aggregation_to_gold(start_date, end_date):
 
         # Fetch all cards for the given date range
         get_all_cards(spark, start_date, end_date)
-        logger.success('Completed get all cards job')
+        logger.success('Completed get all cards by date range job')
 
     except Exception as error:
         logger.exception(

@@ -12,7 +12,7 @@ import argparse
 from loguru import logger
 from pyspark.sql.functions import col
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from helpers import spark_helper as sh, common_functions as cf, trello_functions as tf
+from helpers import spark_helper as sh
 from config import delta_table_conf as dc
 
 def get_cards(spark, start_date, end_date):
@@ -35,8 +35,8 @@ def get_cards(spark, start_date, end_date):
         logger.info(f'Got the user cards based on specific user')
 
         # Get the dates
-        start_date = datetime.strptime(start_date, "%Y-%m-%d")
-        end_date = datetime.strptime(end_date, "%Y-%m-%d")
+        start_date = datetime.strptime(start_date, "%d-%m-%Y")
+        end_date = datetime.strptime(end_date, "%d-%m-%Y")
 
         user_date_cards = user_card_data.where((col('dateLastActivity') == start_date) & (col('dateLastActivity') == end_date))
         logger.info(f'Fetched user cards for specific duration')
@@ -50,9 +50,9 @@ def get_cards(spark, start_date, end_date):
             "overwrite").option("mergeSchema", 'true').save(path)
 
         logger.success(
-            f'\n Saved no activity doing cards data for board {board_id} {board_name}')
+            f'\n Saved user data for specified duration')
         logger.info(
-            f'Saved no activity doing cards data for board {board_id} {board_name} to {path} table')
+            f'Saved user data to {path} table')
 
     except Exception as error:
         logger.exception(

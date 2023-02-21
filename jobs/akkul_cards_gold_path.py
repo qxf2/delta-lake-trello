@@ -39,7 +39,7 @@ def get_user_cards(spark, start_date, end_date):
         refined_cards_data = refined_cards_data.withColumn("dateLastActivity", to_date(from_utc_timestamp("dateLastActivity", "UTC")))
 
         # Filter the DataFrame for the given user and date range
-        filtered_cards_data = refined_cards_data.filter((col("card_members").like("%Akkul%")) & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
+        filtered_cards_data = refined_cards_data.filter((col("card_members").like("%akkuldn%")) & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
         logger.info(f'Fetched user card data within the date range')  
 
         #Select the required columns

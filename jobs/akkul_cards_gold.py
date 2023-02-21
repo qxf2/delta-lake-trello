@@ -7,12 +7,12 @@ This script will fetch all the cards from silver unique cards table and
 
 import os
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta
 import argparse
 from loguru import logger
-from pyspark.sql.functions import col
+from pyspark.sql.functions import col, from_utc_timestamp, to_date
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from helpers import spark_helper as sh
+from helpers import spark_helper as sh, common_functions as cf, trello_functions as tf
 from config import delta_table_conf as dc
 
 def get_user_cards(spark, start_date, end_date):

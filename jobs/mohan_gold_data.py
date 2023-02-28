@@ -49,7 +49,6 @@ def get_user_cards(spark, start_date, end_date):
         #Write the data to Delta Lake Gold table
         filtered_cards_data.write.format('delta').mode(
             "overwrite").option("mergeSchema", 'true').save(path)    
-
         logger.success(
             f'\n Saved user card data for the given data range')
         logger.info(
@@ -59,7 +58,6 @@ def get_user_cards(spark, start_date, end_date):
         logger.exception(
             f'Exception while fetching cards data')
         raise error
-
 
 def perform_user_cards_aggregation_to_gold(start_date, end_date):
     """

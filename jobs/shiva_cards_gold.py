@@ -26,6 +26,13 @@ class SilverTable(Enum):
 class GoldTable(Enum):
     Shiva = conf.shiva_cards_gold_path
 
+class TrelloCardProperties(Enum):
+    ID = "id"
+    NAME = "name"
+    MEMBERS = "card_members"
+    LASTUPDATED = "LastUpdated"
+    BOARDNAME = "board_name"
+
 class Aggregator():
     "Create Gold Delta Lake tables based on specific use case"
     def __init__(self, member:str, silver_table:str, gold_table:str, start_date:datetime=None, end_date:datetime=None):
@@ -110,6 +117,10 @@ class Aggregator():
 
             if self.start_date and self.end_date:
                 cards = cards.where((col("dateLastActivity") >= self.start_date) & (col("dateLastActivity") <= self.end_date))
+
+            # Filter the columns based on TrellCardProperties
+            if cards:
+                cards = cards.select([field.value for field in TrelloCardProperties])
             
             return cards
         except Exception as err:

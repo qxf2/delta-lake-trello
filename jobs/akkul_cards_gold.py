@@ -12,7 +12,7 @@ import argparse
 from loguru import logger
 from pyspark.sql.functions import col, from_utc_timestamp, to_date
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from helpers import spark_helper as sh, common_functions as cf, trello_functions as tf
+from helpers import spark_helper as sh
 from config import delta_table_conf as dc
 
 def get_user_cards(spark, start_date, end_date):
@@ -39,12 +39,12 @@ def get_user_cards(spark, start_date, end_date):
         refined_cards_data = refined_cards_data.withColumn("dateLastActivity", to_date(from_utc_timestamp("dateLastActivity", "UTC")))
 
         # Filter the DataFrame for the given user and date range
-        filtered_cards_data = refined_cards_data.filter((col("card_members").like("%Akkul DN%")) & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
+        filtered_cards_data = refined_cards_data.filter((col("card_members").like("%akkul%")) & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
         logger.info(f'Fetched user card data within the date range')  
 
         #Select the required columns
         filtered_cards_data = filtered_cards_data.select(
-            "id", "name", "LastUpdated", "board_name")
+            "id", "name", "LastUpdated", "board_name", "card_members")
 
         #Write the data to Delta Lake Gold table
         filtered_cards_data.write.format('delta').mode(

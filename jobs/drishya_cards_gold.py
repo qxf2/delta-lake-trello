@@ -13,7 +13,7 @@ import argparse
 from loguru import logger
 from pyspark.sql.functions import col
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-from helpers import spark_helper as sh, common_functions as cf,trello_functions as tf
+from helpers import spark_helper as sh
 from config import delta_table_conf as dc
 
 
@@ -42,7 +42,7 @@ def get_user_activity_cards(spark, start_date, end_date, nameofuser):
 
         #Select the required columns
         user_only_cards = user_cards.select(
-            "id", "name", "LastUpdated", "board_name")
+            "id", "name","card_members", "LastUpdated", "board_name")
 
         #Write the data to Delta Lake Gold table
         user_only_cards.write.format('delta').mode(
@@ -87,6 +87,6 @@ if __name__ == "__main__":
     PARSER = argparse.ArgumentParser(description='Create gold delta table for User')
     PARSER.add_argument('--start_date',type=str,required=True,help="Start Date format YYYY-MM-DD")
     PARSER.add_argument('--end_date',type=str,required=True,help="Start Date format YYYY-MM-DD")
-    PARSER.add_argument('--name',type=str,required=True,help="Name to Fetch the Gold cards")
+    
     ARGS = PARSER.parse_args()
-    fetch_drishya_aggregation_to_gold(ARGS.start_date,ARGS.end_date,ARGS.name)
+    fetch_drishya_aggregation_to_gold(ARGS.start_date,ARGS.end_date,name_user="Drishya")

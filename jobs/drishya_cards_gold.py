@@ -30,7 +30,7 @@ def get_user_activity_cards(spark, start_date, end_date, nameofuser):
     try:
         # Fetch the cards data from the refined cards silver delta table
         refined_cards_data = spark.read.format(
-            "delta").load(dc.cards_silver_table_path)
+            "delta").load(dc.cards_unique_silver_table_path)
         logger.info(f'Fetched the refined cards data from silver table')
 
         # Convert dates to a datetime object
@@ -70,7 +70,7 @@ def fetch_drishya_aggregation_to_gold(start_date, end_date,name_user):
         spark, context = sh.start_spark()
 
         logger.info(
-            f'Fetched sprint board info for {start_date} between {end_date}')
+            f'Fetched info for {start_date} between {end_date}')
 
         # Fetch cards that required for the user within the specified dates
         get_user_activity_cards(spark, start_date, end_date, name_user)

@@ -35,7 +35,7 @@ def get_member_cards(start_date,end_date):
         start_date = datetime.strptime(start_date,'%Y-%m-%d')
         end_date = datetime.strptime(end_date,'%Y-%m-%d')
         # filter the data based on name, start date and end date
-        filtered_data = refined_cards_data.filter(col("card_members").contains("%raghavanelabhotla%") & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
+        filtered_data = refined_cards_data.filter(col("card_members").contains("raghava.nelabhotla") & (col("dateLastActivity") >= start_date) & (col("dateLastActivity") <= end_date))
 
         #Select the required columns
         member_cards_data = filtered_data.select(

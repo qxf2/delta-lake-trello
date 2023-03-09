@@ -1,7 +1,6 @@
 """
 Contains the paths of the delta tables
 """
-
 cards_bronze_table_path = '/home/ubuntu/lakehouse_project/data_tables/bronze_cards_table'
 members_bronze_table_path = '/home/ubuntu/lakehouse_project/data_tables/bronze_members_table'
 cards_silver_table_path = '/home/ubuntu/lakehouse_project/data_tables/silver_cards_table'
@@ -20,4 +19,3 @@ raghava_cards_gold_path = '/home/ubuntu/lakehouse_project/data_tables/raghava_ca
 raji_cards_gold_path = '/home/ubuntu/lakehouse_project/data_tables/raji_cards_gold_table'
 rohan_cards_gold_path = '/home/ubuntu/lakehouse_project/data_tables/rohan_cards_gold_table'
 shiva_cards_gold_path = '/home/ubuntu/lakehouse_project/data_tables/shiva_cards_gold_table'
-

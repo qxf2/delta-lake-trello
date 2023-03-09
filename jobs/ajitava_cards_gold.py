@@ -31,7 +31,7 @@ def get_cards(spark, start_date, end_date):
         logger.info(f'Fetched the refined cards data from silver table')
         
         #Fetch the data based on user
-        user_card_data = refined_cards_data.filter((col("card_members").like("Ajitava Deb")))
+        user_card_data = refined_cards_data.filter((col("card_members").like("%Ajitava%")))
         logger.info(f'Got the user cards based on specific user')
 
         # Get the dates

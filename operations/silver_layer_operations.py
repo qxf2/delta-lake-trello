@@ -44,7 +44,7 @@ def refine_current_board_cards_silver(spark, board_id, board_name):
 
         # Change the format of dateLastActivity for readability
         refined_cards_data = refined_cards_data.withColumn(
-            'LastUpdated', date_format('dateLastActivity', "d MMM"))
+            'LastUpdated', date_format('dateLastActivity', "dd-MM-yyyy"))
 
         # Add board_name to the list of columns
         refined_cards_data = refined_cards_data.withColumn(
